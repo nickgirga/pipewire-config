@@ -1,82 +1,84 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-#pasta de configuração do pipewire
+# pipewire config directory
 pipewiredir=$HOME/.config/pipewire
 
-#copiar os arquivos de config p/ $HOME/.config/pipewire
-#caso não exista o diretorio, criar
-test -d pepiwiredir || mkdir -p $pipewiredir
+# create pipewire config directory if it does not exist
+test -d $pipewiredir || mkdir -p $pipewiredir
+
+# copy system config files to config directory
 cp -rn /usr/share/pipewire/* ~/.config/pipewire/
 
 
-#arquivos de configuração
+# config files
 pipewireconf=$pipewiredir/pipewire.conf
 jackconf=$pipewiredir/jack.conf
 
-#lista de SampleRate
+# sample rates
 samples="22050|32000|44100|48000|88200|96000|192000"
-#lista de FramePeriod
+# frame periods
 frames="16|32|64|128|256|512|1024|2048|4096"
-#lista BufferSize
+# buffer sizes
 # buffer="32|64|128|256|512|1024|2048|4096"
 
-atualSamples=$(grep 'default.clock.rate' $pipewireconf | awk '{print $3}')
-atualFrames=$(grep 'default.clock.quantum' $pipewireconf | grep -v limit | awk '{print $3}')
-atualBufferSize=$(sed -n '/jack.properties/,/^$/p' $jackconf | grep node.latency | awk '{print $3}' | cut -d '/' -f1)
+# get current pipewire configuration values
+sampleRateValue=$(grep 'default.clock.rate' $pipewireconf | awk '{print $3}')
+framePeriodValue=$(grep 'default.clock.quantum' $pipewireconf | grep -v limit | grep -v floor | awk '{print $3}')
+bufferSizeValue=$(sed -n '/jack.properties/,/^$/p' $jackconf | grep node.latency | awk '{print $3}' | cut -d '/' -f1)
 
-#caixa de dialogo perguntando a configuração desejada
+# ask user for configuration
 pipewiresetting=$(zenity --title "PipeWire Config" \
     --window-icon="/usr/share/icons/hicolor/48x48/apps/pipewire.png" \
-    --text="Samplerate Default = 48000\nFramePeriod Default = 1024\n\nSamplerate Atual = $atualSamples\nFramePeriod Atual = $atualFrames"\
+    --text="Sample Rate Default = 48000\nFrame Period Default = 1024\n\nSample Rate Value = $sampleRateValue\nFrame Period Value = $framePeriodValue"\
     --forms \
     --add-combo "Sample Rate" --add-combo "Frame Period" \
     --combo-values "${samples[@]}" --combo-values "${frames[@]}" \
     --width=250)
     
-    #\nBufferSize Default = 1024
-    #\nBufferSize Atual = $atualBufferSize
-    #--add-combo "BufferSize"
+    #\nBuffer Size Default = 1024
+    #\nBuffer Size Value = $bufferSizeValue
+    #--add-combo "Buffer Size"
     #--combo-values "${buffer[@]}"
     
-#se apertar em cacnelar, sair
+# quit when cancel pressed
 if [ "$?" = "1" ]; then
     exit 0
 fi
 
-#descobre o samplerate e frameperiod escolhidos
+# get chosen Sample Rate and Frame Period
 samplerate=$(echo $pipewiresetting | cut -d "|" -f1)
 frameperiod=$(echo $pipewiresetting | cut -d "|" -f2)
 # buffeSize=$(echo $pipewiresetting | cut -d "|" -f3)
 
-#se estiver vaziu avisar e sair
+# invalid values provided
 if [ -z "$samplerate" -o -z "$frameperiod" ]; then
     #-o -z "$buffeSize"
-    zenity --error --text "Por Favor escolha valores validos.\nNão pode deixar em branco." --width=380
+    zenity --error --text "Please choose valid values." --width=380
     exit 1
 fi
 
 ## PipeWire Sample Rate ##
-#tirar o # da frente do clockrate
+# remove # from clock rate
 sed -i "/default.clock.rate/s/#//" $pipewireconf
-#trocar o clock rate
+# change clock rate
 sed -i "/default.clock.rate/s/=.*$/= $samplerate/" $pipewireconf
 
 ## PipeWire Frame Period ##
-#tiar o # da frente do clockquantum
+# remove # from clock quantum
 sed -i "/default.clock.quantum/s/#//" $pipewireconf
-#trocar o clock quantum
+# change clock quantum
 sed -i "/default.clock.quantum/s/=.*$/= $frameperiod/" $pipewireconf
 
 ## Jack BufferSize ##
-#tiar o # da frente do node.latency
+# remove # from node.latency
 # sed -i '/jack.properties/!b;n;s/#//' $jackconf
-#trocar o node.latency
+# change node.latency
 # sed -i "/jack.properties/!b;n;s/=.*/= $buffeSize\/$samplerate/" $jackconf
 if [ -z "$(sed -n '/jack.properties/{n;p;}' $jackconf | grep '#')" ];then
     sed -i '/jack.properties/!b;n;s/node/#node/' $jackconf
 fi
 
 
-#aplicar configurações ao PipeWire
+# restart pipewire to apply settings
 systemctl restart --user pipewire.service
 systemctl restart --user pipewire-pulse.service

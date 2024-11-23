@@ -1,7 +1,7 @@
 # nickgirga/pipewire-config
 [pipewire-config](https://github.com/xivastudio/pipewire-config) is a project originally created by [XIVA Studio](https://github.com/xivastudio) in an effort to make configuring [pipewire](https://www.pipewire.org/) a bit easier, using [Zenity](https://gitlab.gnome.org/GNOME/zenity) GUI elements. It's a basic bash script that asks zenity to present you with the right options to configure your install of pipewire.
 
-![screenshot_0.png](.screenshots/screenshot_0.png)
+![screenshot_1.png](.screenshots/screenshot_1.png)
 
 ### install.sh vs install_local.sh
 Which installer should you chose?
