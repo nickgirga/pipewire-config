@@ -1,5 +1,7 @@
 # nickgirga/pipewire-config
-[pipewire-config](https://github.com/xivastudio/pipewire-config) is a project originally created by [XIVA Studio](https://github.com/xivastudio) in an effort to make configuring pipewire a bit easier, using [Zenity](https://gitlab.gnome.org/GNOME/zenity) GUI elements. It's a basic bash script that asks zenity to present you with the right options to configure your install of pipewire.
+[pipewire-config](https://github.com/xivastudio/pipewire-config) is a project originally created by [XIVA Studio](https://github.com/xivastudio) in an effort to make configuring [pipewire](https://www.pipewire.org/) a bit easier, using [Zenity](https://gitlab.gnome.org/GNOME/zenity) GUI elements. It's a basic bash script that asks zenity to present you with the right options to configure your install of pipewire.
+
+![screenshot_0.png](.screenshots/screenshot_0.png)
 
 ### install.sh vs install_local.sh
 Which installer should you chose?
@@ -8,7 +10,7 @@ Which installer should you chose?
 [`install.sh`](install.sh) is the original installer, intended to install the app in the `/usr` directory. System files. This requires super user permissions (sudo). This has been the traditional paradigm for installing software on Linux for decades. Many of you may prefer this soley due to familiarity.
 
 #### install_local.sh
-[`install_local.sh`](install_local.sh) is the modified installer, intended to install the app in the `$HOME/.local` prefix. User files. This does not require any super user permissions. However, it won't work as well system-wide (e.g. on another user's account). This is becoming a more desirable paradigm for users that prefer immutable systems like Fedora Atomic (Silverblue/Kionite) or SteamOS. It will be less intrusive on the system, can be easily removed, backed up, and modified. It's a bit more portable. This is my (nickgirga's) personal preference and the main reason this fork even exists.
+[`install_local.sh`](install_local.sh) is the modified installer, intended to install the app in the `$HOME/.local` prefix. User files. This does not require any super user permissions. However, it won't work as well system-wide (e.g. on another user's account). This is becoming a more desirable paradigm for users that prefer immutable systems like Fedora Atomic (Silverblue/Kionite) or SteamOS. It will be less intrusive on the system, can be easily removed, backed up, and modified. It's a bit more portable. This is my ([nickgirga](https://github.com/nickgirga)'s) personal preference and the main reason this fork even exists.
 
 ### Obtaining
 #### Download a Release (Stable) - GUI
